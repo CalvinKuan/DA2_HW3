@@ -2,15 +2,33 @@
 
 A Qt 5 program for drawing, selecting, querying and editing Rectangle, Boundary and Path shapes.
 
-## Features
+The features are split into two groups:
+
+- **Base features**: what the assignment package (`object_viewer_02102023`) already provides.
+- **Extra features**: what was added on top of it. Every extra block in the source code is framed with slashes, so it is easy to find:
+
+  ```cpp
+  //////////////////////////////////////////////////////////////////////
+  //////////  EXTRA START: Merge Paths
+  //////////////////////////////////////////////////////////////////////
+  ... extra code ...
+  //////////////////////////////////////////////////////////////////////
+  //////////  EXTRA END: Merge Paths
+  //////////////////////////////////////////////////////////////////////
+  ```
+
+  List all of them with `grep -rn "EXTRA START" *.cpp *.h`.
+
+---
+
+## Base features
 
 ### File
 
 | Feature | Shortcut | Description |
 |---|---|---|
 | Open... | - | Open a GDS file and print its records. Press Cancel to show the sample shapes |
-| Query Selected | Q | Show the type, layer and coordinates of the selected objects (several at once are supported) |
-| Save Image... | Ctrl+S | Save the canvas as a png, jpg or bmp image |
+| Query Selected | Q | Show the type, layer and coordinates of the selected object |
 | Quit | - | Exit the program |
 
 ### Edit
@@ -20,15 +38,7 @@ A Qt 5 program for drawing, selecting, querying and editing Rectangle, Boundary 
 | Rectangle | R | Click two points to draw a rectangle |
 | Boundary | B | Click points, press Enter to finish; draws a polygon |
 | Path | P | Click points, press Enter to finish; draws a horizontal/vertical path |
-| Delete | Delete | Delete all selected objects |
-| Merge Paths | M | Join the selected paths end to end into one path. Paths must be on the same layer, have the same width, and have end points within 15 px of each other |
-| Move | V | Click a base point, then a destination point, to move all selected objects |
-| Duplicate | Ctrl+D | Copy the selected objects; the copies become the selection |
-| Set Layer... | L | Change the layer of the selected objects (0-19) |
-| Rotate 90° | Ctrl+R | Rotate clockwise about the center of the selection |
-| Flip Horizontal | Ctrl+H | Mirror left-right |
-| Flip Vertical | Ctrl+Shift+H | Mirror top-bottom |
-| Select All | Ctrl+A | Select every shape |
+| Delete | Delete | Delete the selected object |
 | Delete All | - | Remove all shapes |
 
 ### View
@@ -44,10 +54,59 @@ A Qt 5 program for drawing, selecting, querying and editing Rectangle, Boundary 
 | Action | Description |
 |---|---|
 | Click a shape | Select it |
-| Shift + click | Add a shape to, or remove it from, the selection (multi-select) |
 | Click empty space | Clear the selection |
+
+---
+
+## Extra features
+
+Save Image and Merge Paths come from the enhancement ideas suggested in the assignment handout. The rest go beyond it.
+
+### File
+
+| Feature | Shortcut | Description |
+|---|---|---|
+| Save Image... | Ctrl+S | Save the canvas as a png, jpg or bmp image |
+| Query Selected (several objects) | Q | The base Query now also works when several objects are selected: each one is listed under a `[n/N]` heading |
+
+### Edit
+
+| Feature | Shortcut | Description |
+|---|---|---|
+| Merge Paths | M | Join the selected paths end to end into one path. Paths must be on the same layer, have the same width, and have end points within 15 px of each other |
+| Move | V | Click a base point, then a destination point, to move all selected objects. The selection follows the cursor as a preview |
+| Duplicate | Ctrl+D | Copy the selected objects; the copies become the selection |
+| Set Layer... | L | Change the layer of the selected objects (0-19) |
+| Rotate 90° | Ctrl+R | Rotate clockwise about the center of the selection |
+| Flip Horizontal | Ctrl+H | Mirror left-right |
+| Flip Vertical | Ctrl+Shift+H | Mirror top-bottom |
+| Select All | Ctrl+A | Select every shape |
+
+### Mouse and window
+
+| Action | Description |
+|---|---|
+| Shift + click | Add a shape to, or remove it from, the selection (multi-select) |
 | Mouse wheel | Zoom about the cursor (disabled while a shape is being drawn) |
 | Move the mouse | The cursor position (user coordinates) is shown at the bottom right of the window |
+
+### Where the extra code is
+
+| Feature | Location |
+|---|---|
+| Save Image | `MainWindow::saveImage` in `main_window.cpp` |
+| Merge Paths | `Canvas::mergeSelectedPaths` in `canvas.cpp`, `MainWindow::mergePaths` in `main_window.cpp`, `PathShape::getWidth` / `getEndStyle` in `shape.h` |
+| Move | `Canvas::moveSelection` and the `Move` case of `Canvas::paintEvent` in `canvas.cpp`, `MainWindow::moveObjects` in `main_window.cpp`, `ShapeObject::translate` in `shape.cpp`, `Move` in `CommandType` (`canvas.h`) |
+| Duplicate | `Canvas::duplicateSelection` in `canvas.cpp`, `ShapeObject::clone` (and its overrides) in `shape.h` |
+| Set Layer | `Canvas::setSelectionLayer` in `canvas.cpp`, `ShapeObject::setLayer` / `layerCount` in `shape.cpp` |
+| Rotate / Flip | `Canvas::rotateSelection` / `flipSelection` / `selectionCenter` in `canvas.cpp`, `ShapeObject::rotate90` / `flip` / `boundingRect` in `shape.cpp` |
+| Select All | `Canvas::selectAll` in `canvas.cpp` |
+| Multi-select (Shift+click) | `Canvas::mousePressEvent` in `canvas.cpp` |
+| Query several objects | `Canvas::query` in `canvas.cpp` |
+| Mouse wheel zoom | `Canvas::wheelEvent` in `canvas.cpp`, `Transform::zoomAt` in `transform.h` |
+| Cursor coordinates | `Canvas::mouseMoveEvent` (`CursorMoved` signal) in `canvas.cpp`, `MainWindow::showCursorPos` in `main_window.cpp` |
+
+---
 
 ## Build and Run
 

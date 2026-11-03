@@ -61,6 +61,9 @@ public:
         setScale(size);
     }
 
+    //////////////////////////////////////////////////////////////////////
+    //////////  EXTRA START: Mouse wheel zoom
+    //////////////////////////////////////////////////////////////////////
     // zoom about a screen point so the user point under it stays put.
     // factor < 1 zooms in, factor > 1 zooms out
     void zoomAt(const QPointF & screenPt, double factor, const QSize & size)
@@ -74,6 +77,9 @@ public:
         _userRect = QRectF(anchor.x() - fracX * newW, anchor.y() - fracY * newH, newW, newH);
         setScale(size);
     }
+    //////////////////////////////////////////////////////////////////////
+    //////////  EXTRA END: Mouse wheel zoom
+    //////////////////////////////////////////////////////////////////////
 
     void zoomFit(const QSize & size)
     {
